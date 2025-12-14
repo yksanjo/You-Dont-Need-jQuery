@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
-import { Code, Play, Sparkles } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Code, Play, Sparkles, Copy, Check, Search } from 'lucide-react';
 
 const CodeComparison = () => {
   const [activeTab, setActiveTab] = useState('jquery');
   const [selectedExample, setSelectedExample] = useState(0);
   const [demoOutput, setDemoOutput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const examples = [
     {
       title: 'Selecting Elements',
+      category: 'DOM',
       jquery: `// jQuery
 $('.my-class')
 $('#my-id')
@@ -17,10 +20,12 @@ $('div')`,
 document.querySelectorAll('.my-class')
 document.getElementById('my-id')
 document.querySelectorAll('div')`,
-      demo: () => 'Selected 3 elements from the DOM!'
+      demo: () => 'Selected 3 elements from the DOM!',
+      compatibility: 'IE9+ (querySelector), IE6+ (getElementById)'
     },
     {
       title: 'Adding Event Listeners',
+      category: 'DOM',
       jquery: `// jQuery
 $('.button').click(function() {
   alert('Clicked!');
@@ -30,19 +35,23 @@ document.querySelector('.button')
   .addEventListener('click', () => {
     alert('Clicked!');
   });`,
-      demo: () => 'Event listener added! 🎉'
+      demo: () => 'Event listener added! 🎉',
+      compatibility: 'IE9+'
     },
     {
       title: 'Toggling Classes',
+      category: 'DOM',
       jquery: `// jQuery
 $('.box').toggleClass('active');`,
       vanilla: `// Vanilla JS
 document.querySelector('.box')
   .classList.toggle('active');`,
-      demo: () => 'Class toggled successfully!'
+      demo: () => 'Class toggled successfully!',
+      compatibility: 'IE10+'
     },
     {
       title: 'Showing/Hiding Elements',
+      category: 'DOM',
       jquery: `// jQuery
 $('.element').hide();
 $('.element').show();`,
@@ -51,20 +60,24 @@ el.style.display = 'none';
 el.style.display = 'block';
 // Or use classList
 el.classList.add('hidden');`,
-      demo: () => 'Element visibility changed!'
+      demo: () => 'Element visibility changed!',
+      compatibility: 'All browsers'
     },
     {
       title: 'Getting/Setting Text',
+      category: 'DOM',
       jquery: `// jQuery
 $('.title').text('New Title');
 const text = $('.title').text();`,
       vanilla: `// Vanilla JS
 el.textContent = 'New Title';
 const text = el.textContent;`,
-      demo: () => 'Text updated to: "New Title"'
+      demo: () => 'Text updated to: "New Title"',
+      compatibility: 'IE9+'
     },
     {
       title: 'AJAX Requests',
+      category: 'Network',
       jquery: `// jQuery
 $.ajax({
   url: '/api/data',
@@ -74,10 +87,12 @@ $.ajax({
 fetch('/api/data')
   .then(res => res.json())
   .then(data => console.log(data));`,
-      demo: () => 'Fetch request ready to go! 🚀'
+      demo: () => 'Fetch request ready to go! 🚀',
+      compatibility: 'IE11+ (or use polyfill)'
     },
     {
       title: 'Fading Effects',
+      category: 'DOM',
       jquery: `// jQuery
 $('.box').fadeIn();
 $('.box').fadeOut();`,
@@ -85,10 +100,12 @@ $('.box').fadeOut();`,
 el.style.transition = 'opacity 0.3s';
 el.style.opacity = '1'; // fadeIn
 el.style.opacity = '0'; // fadeOut`,
-      demo: () => 'Fade animation applied!'
+      demo: () => 'Fade animation applied!',
+      compatibility: 'IE10+ (transition), IE9+ (opacity)'
     },
     {
       title: 'Getting Parent/Children',
+      category: 'DOM',
       jquery: `// jQuery
 $('.child').parent();
 $('.parent').children();`,
@@ -97,15 +114,146 @@ el.parentElement;
 el.children;
 // Or for all descendants:
 el.querySelectorAll('*');`,
-      demo: () => 'Parent/children elements accessed!'
+      demo: () => 'Parent/children elements accessed!',
+      compatibility: 'All browsers'
+    },
+    {
+      title: 'Creating Elements',
+      category: 'DOM',
+      jquery: `// jQuery
+const div = $('<div>');
+div.addClass('new-box');
+$('body').append(div);`,
+      vanilla: `// Vanilla JS
+const div = document.createElement('div');
+div.classList.add('new-box');
+document.body.appendChild(div);`,
+      demo: () => 'Element created and appended!',
+      compatibility: 'All browsers'
+    },
+    {
+      title: 'Removing Elements',
+      category: 'DOM',
+      jquery: `// jQuery
+$('.element').remove();`,
+      vanilla: `// Vanilla JS
+el.remove();
+// Or for older browsers:
+el.parentNode.removeChild(el);`,
+      demo: () => 'Element removed from DOM!',
+      compatibility: 'IE9+ (remove()), All (removeChild)'
+    },
+    {
+      title: 'Array Filter',
+      category: 'Arrays',
+      jquery: `// jQuery
+const filtered = $.grep([1, 2, 3, 4], 
+  function(n) { return n > 2; });`,
+      vanilla: `// Vanilla JS
+const filtered = [1, 2, 3, 4]
+  .filter(n => n > 2);`,
+      demo: () => 'Array filtered: [3, 4]',
+      compatibility: 'IE9+'
+    },
+    {
+      title: 'Array Map',
+      category: 'Arrays',
+      jquery: `// jQuery
+const doubled = $.map([1, 2, 3], 
+  function(n) { return n * 2; });`,
+      vanilla: `// Vanilla JS
+const doubled = [1, 2, 3]
+  .map(n => n * 2);`,
+      demo: () => 'Array mapped: [2, 4, 6]',
+      compatibility: 'IE9+'
+    },
+    {
+      title: 'Promises',
+      category: 'Async',
+      jquery: `// jQuery
+$.Deferred()
+  .resolve('Success')
+  .then(function(result) {
+    console.log(result);
+  });`,
+      vanilla: `// Vanilla JS
+Promise.resolve('Success')
+  .then(result => {
+    console.log(result);
+  });`,
+      demo: () => 'Promise resolved successfully!',
+      compatibility: 'IE11+ (or use polyfill)'
+    },
+    {
+      title: 'localStorage',
+      category: 'Storage',
+      jquery: `// jQuery (with plugin)
+$.jStorage.set('key', 'value');
+const value = $.jStorage.get('key');`,
+      vanilla: `// Vanilla JS
+localStorage.setItem('key', 'value');
+const value = localStorage.getItem('key');`,
+      demo: () => 'Data saved to localStorage!',
+      compatibility: 'IE8+'
+    },
+    {
+      title: 'JSON Parse/Stringify',
+      category: 'Data',
+      jquery: `// jQuery
+const obj = $.parseJSON('{"key":"value"}');
+const str = JSON.stringify(obj);`,
+      vanilla: `// Vanilla JS
+const obj = JSON.parse('{"key":"value"}');
+const str = JSON.stringify(obj);`,
+      demo: () => 'JSON parsed and stringified!',
+      compatibility: 'IE8+'
+    },
+    {
+      title: 'Each/ForEach',
+      category: 'Arrays',
+      jquery: `// jQuery
+$.each([1, 2, 3], function(i, val) {
+  console.log(val);
+});`,
+      vanilla: `// Vanilla JS
+[1, 2, 3].forEach((val, i) => {
+  console.log(val);
+});`,
+      demo: () => 'Array iterated successfully!',
+      compatibility: 'IE9+'
     }
   ];
 
+  const filteredExamples = useMemo(() => {
+    if (!searchQuery) return examples;
+    const query = searchQuery.toLowerCase();
+    return examples.filter(example => 
+      example.title.toLowerCase().includes(query) ||
+      example.category.toLowerCase().includes(query) ||
+      example.jquery.toLowerCase().includes(query) ||
+      example.vanilla.toLowerCase().includes(query)
+    );
+  }, [searchQuery]);
+
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
   const runDemo = () => {
-    const output = examples[selectedExample].demo();
+    const currentExample = filteredExamples[selectedExample] || examples[0];
+    const output = currentExample.demo();
     setDemoOutput(output);
     setTimeout(() => setDemoOutput(''), 2000);
   };
+
+  const currentExample = filteredExamples[selectedExample] || examples[0];
+  const currentCode = activeTab === 'jquery' ? currentExample.jquery : currentExample.vanilla;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 p-8">
@@ -124,22 +272,46 @@ el.querySelectorAll('*');`,
           </p>
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative max-w-md mx-auto">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search examples (e.g., 'array', 'DOM', 'promise')..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSelectedExample(0);
+                setDemoOutput('');
+              }}
+              className="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-purple-500 focus:outline-none transition-all"
+            />
+          </div>
+          {searchQuery && (
+            <p className="text-center mt-2 text-gray-600 text-sm">
+              Found {filteredExamples.length} example{filteredExamples.length !== 1 ? 's' : ''}
+            </p>
+          )}
+        </div>
+
         {/* Example Selector */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-          {examples.map((example, idx) => (
+          {filteredExamples.map((example, idx) => (
             <button
               key={idx}
               onClick={() => {
                 setSelectedExample(idx);
                 setDemoOutput('');
               }}
-              className={`p-4 rounded-lg font-medium transition-all ${
+              className={`p-4 rounded-lg font-medium transition-all relative ${
                 selectedExample === idx
                   ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg scale-105'
                   : 'bg-white text-gray-700 hover:shadow-md hover:scale-102'
               }`}
             >
-              {example.title}
+              <div className="text-xs opacity-75 mb-1">{example.category}</div>
+              <div>{example.title}</div>
             </button>
           ))}
         </div>
@@ -174,13 +346,36 @@ el.querySelectorAll('*');`,
 
           {/* Code Display */}
           <div className="p-8">
-            <pre className="bg-gray-900 text-gray-100 p-6 rounded-lg overflow-x-auto">
-              <code className="text-sm font-mono">
-                {activeTab === 'jquery'
-                  ? examples[selectedExample].jquery
-                  : examples[selectedExample].vanilla}
-              </code>
-            </pre>
+            <div className="relative">
+              <pre className="bg-gray-900 text-gray-100 p-6 rounded-lg overflow-x-auto">
+                <code className="text-sm font-mono">
+                  {currentCode}
+                </code>
+              </pre>
+              <button
+                onClick={() => copyToClipboard(currentCode)}
+                className="absolute top-4 right-4 p-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all flex items-center gap-2"
+                title="Copy code"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span className="text-xs">Copied!</span>
+                  </>
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+
+            {/* Browser Compatibility */}
+            {currentExample.compatibility && (
+              <div className="mt-4 p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+                <p className="text-sm text-blue-800">
+                  <strong>Browser Support:</strong> {currentExample.compatibility}
+                </p>
+              </div>
+            )}
 
             {/* Run Demo Button */}
             <div className="mt-6 flex items-center gap-4">
