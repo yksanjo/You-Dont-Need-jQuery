@@ -1,5 +1,9 @@
 # You Don't Need jQuery
 
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow.svg)](https://www.javascript.com/) [![GitHub stars](https://img.shields.io/github/stars/yksanjo/You-Dont-Need-jQuery?style=social)](https://github.com/yksanjo/You-Dont-Need-jQuery/stargazers) [![GitHub forks](https://img.shields.io/github/forks/yksanjo/You-Dont-Need-jQuery.svg)](https://github.com/yksanjo/You-Dont-Need-jQuery/network/members) [![GitHub issues](https://img.shields.io/github/issues/yksanjo/You-Dont-Need-jQuery.svg)](https://github.com/yksanjo/You-Dont-Need-jQuery/issues)
+[![Last commit](https://img.shields.io/github/last-commit/yksanjo/You-Dont-Need-jQuery.svg)](https://github.com/yksanjo/You-Dont-Need-jQuery/commits/main)
+
+
 A beautiful React application demonstrating vanilla JavaScript equivalents for common jQuery patterns.
 
 ![You Don't Need jQuery](https://via.placeholder.com/800x400/6366f1/ffffff?text=You+Don't+Need+jQuery)
