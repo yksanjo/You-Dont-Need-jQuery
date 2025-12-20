@@ -428,13 +428,3 @@ $.each([1, 2, 3], function(i, val) {
 };
 
 export default CodeComparison;
-
-
-
-
-
-
-
-
-
-

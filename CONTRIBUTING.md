@@ -79,13 +79,3 @@ npm run build
 Feel free to open an issue for any questions or discussions!
 
 Thank you for contributing! 🎉
-
-
-
-
-
-
-
-
-
-
